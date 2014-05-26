@@ -1,0 +1,108 @@
+Loss in Economic and Health Consequences due to Storm and other severe Weather Events
+========================================================
+
+The aim of this Assessment is to provide a analysis by which we can know the the economic and health issues that are faced due to the Storm and other weather events. The analysis is carried out on the data shared by NOAA, the data contains the characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
+
+## Data Processing
+
+##### Set the Current Working Directory
+##### Make Use of only useful data
+
+
+
+```{r,echo=TRUE,cache=TRUE}
+options(rpubs.upload.method = "internal")
+data=read.csv(bzfile("repdata-data-StormData.csv.bz2"))
+tidydata<-subset(data,!is.na(PROPDMGEXP) & !is.na(CROPDMGEXP),
+                 select=c("FATALITIES","INJURIES","PROPDMG","PROPDMGEXP","CROPDMG","CROPDMGEXP","EVTYPE"))
+str(tidydata)
+```
+
+
+## Getting and Cleaning Data 
+```{r,echo=TRUE}
+Fatalities<-aggregate(tidydata$FATALITIES,by=list(tidydata$EVTYPE),sum)
+
+F1<-Fatalities[order(Fatalities$x,decreasing=TRUE),][1:20,]
+
+Injuries<-aggregate(tidydata$INJURIES,by=list(tidydata$EVTYPE),sum)
+
+I1<-Injuries[order(Injuries$x,decreasing=TRUE),][1:20,]
+
+
+tidydata$PROPDMGEXP<-as.character(tidydata$PROPDMGEXP)
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="B"]<-1000000000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="h"]<-100
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="H"]<-100
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="K"]<-1000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="m"]<-1000000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="M"]<-1000000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="0"]<-000000000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="1"]<-1
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="2"]<-100
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="3"]<-1000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="4"]<-10000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="5"]<-100000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="6"]<-1000000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="7"]<-10000000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="8"]<-100000000
+tidydata$PROPDMGEXP[tidydata$PROPDMGEXP=="9"]<-1000000000
+
+
+
+tidydata$CROPDMGEXP<-as.character(tidydata$CROPDMGEXP)
+tidydata$CROPDMGEXP[tidydata$CROPDMGEXP=="B"]<-1000000000
+tidydata$CROPDMGEXP[tidydata$CROPDMGEXP=="K"]<-1000
+tidydata$CROPDMGEXP[tidydata$CROPDMGEXP=="m"]<-1000000
+tidydata$CROPDMGEXP[tidydata$CROPDMGEXP=="M"]<-1000000
+tidydata$CROPDMGEXP[tidydata$CROPDMGEXP=="0"]<-0
+tidydata$CROPDMGEXP[tidydata$CROPDMGEXP=="2"]<-100
+tidydata$CROPDMGEXP[tidydata$CROPDMGEXP=="?"]<-0
+
+tidydata$totaldamage<-as.numeric(tidydata$PROPDMGEXP)*(tidydata$PROPDMG)
+TotalProp<-aggregate(tidydata$totaldamage,by=list(tidydata$EVTYPE),sum)
+T1<-TotalProp[order(TotalProp$x,decreasing=TRUE,na.last=NA),][1:30,]
+
+
+tidydata$totalcropdamage<-as.numeric(tidydata$CROPDMGEXP)*tidydata$CROPDMG
+TotalCropProp<-aggregate(tidydata$totalcropdamage,by=list(tidydata$EVTYPE),sum)
+T2<-TotalCropProp[order(TotalCropProp$x,decreasing=TRUE,na.last=NA),][1:30,]
+
+
+```
+
+# Results:
+
+##1.Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
+
+## Make Use of Aggregate Function for summing of Fatalities based up on EVTYPE 
+
+```{r,echo=TRUE}
+
+barplot(F1$x, names.arg = F1$Group.1, main = "Fatalities", ylab = "fatalities", cex.axis = 0.8, cex.names = 0.7, las = 2)
+
+
+```
+
+## Make Use of Aggregate Function for summing of Injuries based up on EVTYPE 
+
+```{r,echo=TRUE}
+
+barplot(I1$x, names.arg = I1$Group.1, main = "Injuries", ylab = "Injuries", cex.axis = 0.8, cex.names = 0.7, las = 2)
+
+```
+
+### The Major events that causes the health issues(Fatalities,Injuries) are the events "Tornado"
+
+
+##2.Across the United States, which types of events have the greatest economic consequences?
+
+
+```{r,echo=TRUE}
+
+barplot(T1$x/10^9, names.arg = T1$Group.1, main = "Property Damages", ylab = "Properties", cex.axis = 0.8, cex.names = 0.7, las = 2)
+
+
+barplot(T2$x, names.arg = T2$Group.1, main = "Crop Damages", ylab = "No of Crops", cex.axis = 0.8, cex.names = 0.7, las = 2)
+```
+
