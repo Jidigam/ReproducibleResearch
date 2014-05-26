@@ -3,15 +3,23 @@ Loss in Economic and Health Consequences due to Storm and other severe Weather E
 
 The aim of this Assessment is to provide a analysis by which we can know the the economic and health issues that are faced due to the Storm and other weather events. The analysis is carried out on the data shared by NOAA, the data contains the characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
 
+
+```r
+opts_chunk$set(fig.cap = "")
+```
+
+
+
+
 ## Data Processing
 
 ##### Set the Current Working Directory
-##### Make Use of only useful data
-
+##### Make Use of tidydata
 
 
 
 ```r
+options(rpubs.upload.method = "internal")
 data = read.csv(bzfile("repdata-data-StormData.csv.bz2"))
 tidydata <- subset(data, !is.na(PROPDMGEXP) & !is.na(CROPDMGEXP), select = c("FATALITIES", 
     "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP", "EVTYPE"))
@@ -109,12 +117,11 @@ T2 <- TotalCropProp[order(TotalCropProp$x, decreasing = TRUE, na.last = NA),
 
 
 ```r
-
 barplot(F1$x, names.arg = F1$Group.1, main = "Fatalities", ylab = "fatalities", 
     cex.axis = 0.8, cex.names = 0.7, las = 2)
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+![](figure/plot1.png) 
 
 ```r
 
@@ -130,7 +137,7 @@ barplot(I1$x, names.arg = I1$Group.1, main = "Injuries", ylab = "Injuries",
     cex.axis = 0.8, cex.names = 0.7, las = 2)
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4.png) 
+![](figure/plot2.png) 
 
 
 ### The Major events that causes the health issues(Fatalities,Injuries) are the events "Tornado"
@@ -146,15 +153,19 @@ barplot(T1$x/10^9, names.arg = T1$Group.1, main = "Property Damages", ylab = "Pr
     cex.axis = 0.8, cex.names = 0.7, las = 2)
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-51.png) 
+![](figure/plot3.png) 
+
+
 
 ```r
-
 
 barplot(T2$x, names.arg = T2$Group.1, main = "Crop Damages", ylab = "No of Crops", 
     cex.axis = 0.8, cex.names = 0.7, las = 2)
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-52.png) 
+![](figure/plot4.png) 
 
+
+### Property Damage is maximum due to : "Storm Wind Hail"
+### Crop Damage is maximum due to : "Hail"
 
